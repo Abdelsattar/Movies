@@ -1,9 +1,8 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.abdelsattar.mymovies.MainActivityFragment">
+    android:background="#f0f0f0">
+
     <GridView
         android:id="@+id/gridView"
         android:layout_width="match_parent"
@@ -13,7 +12,7 @@
         android:gravity="center"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
-        android:focusable="true"
+         android:focusable="true"
         android:clickable="true"/>
 
     <ProgressBar
@@ -22,4 +21,4 @@
         android:id="@+id/progressBar"
         android:layout_centerInParent="true"
         android:visibility="gone"/>
-</FrameLayout>
+</RelativeLayout>

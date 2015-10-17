@@ -1,14 +1,17 @@
 package com.example.abdelsattar.mymovies;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -50,6 +53,7 @@ public class detailMovieFragment extends Fragment implements  View.OnClickListen
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> listDataHeader;
+    String HashTag ="#MyMovies";
 
     // now to fill this with data getting from API to use it in the Exapnadable list
 
@@ -71,31 +75,16 @@ public class detailMovieFragment extends Fragment implements  View.OnClickListen
         }
         return fragmentInstance;
     }
-/*
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-    */
-
-//    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_detail_movie, container, false);
-        Bundle bundle = getActivity().getIntent().getExtras();
+        Bundle bundle = getArguments();
+
+        //  Bundle bundle = getActivity().getIntent().getExtras();
         movieObj = new Movie();
 
 
@@ -106,7 +95,6 @@ public class detailMovieFragment extends Fragment implements  View.OnClickListen
 
 
         if(bundle !=null){
-            Log.d("Bundle" , " is not  null");
             movieObj.setTitle(bundle.getString("title"));
             movieObj.setMovieID(bundle.getString("id"));
             movieObj.setPosterURL(bundle.getString("pURL"));
@@ -126,12 +114,10 @@ public class detailMovieFragment extends Fragment implements  View.OnClickListen
                     .into(bgImage);
 
             FetchVideoDetailTask videoDetailTask = new FetchVideoDetailTask();
-            videoDetailTask.execute(movieObj.getMovieID());
-           // videoDetailTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,movieObj.getMovieID());
+            videoDetailTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,movieObj.getMovieID());
 
             FetchReviewDetailTask reviewDetailTask = new FetchReviewDetailTask();
-            reviewDetailTask.execute(movieObj.getMovieID());
-          // reviewDetailTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,movieObj.getMovieID());
+            reviewDetailTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,movieObj.getMovieID());
             /******************  implementing Expandable list   ************************** */
 
             // get the listview
@@ -190,6 +176,52 @@ public class detailMovieFragment extends Fragment implements  View.OnClickListen
    }
 
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(getActivity(), SettingsActivity.class));
+            return true;
+        } else if (id == R.id.action_share) {
+            String share = null;
+            try{
+                Review review = (Review)reviewsData.get(0);
+                share = review.getUrl();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        // Attach an intent to this ShareActionProvider. You can update this at any time,
+        // like when the user selects a new piece of data they might like to share.
+            if ( share != null) {
+                createShareMovieIntent(share);
+            } else {
+                Toast.makeText(getActivity(),
+                        "No Trailers available",
+                        Toast.LENGTH_LONG)
+                        .show();
+               // Log.d(LOG_TAG, "Share Action Provider is null?");
+            }
+            return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void createShareMovieIntent(String share) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT,
+                "http://www.youtube.com/watch?v=" + share + HashTag);
+        startActivity(shareIntent);
+    }
     @Override
     public void onClick(View view) {
 
@@ -610,9 +642,12 @@ public class detailMovieFragment extends Fragment implements  View.OnClickListen
 
                 reviewsData = new ArrayList<Object>(Arrays.asList(result));
                 reviewsString = new ArrayList<Review>(Arrays.asList(result));
+
                 //           mGridAdapter.setGridData(mGridData);
                 // put the data under the list Group
                 listDataChild.put(listDataHeader.get(1), reviewsData);
+
+
             } else {
                 Toast.makeText(getActivity(),
                         "Failed to fetch Reviews!",
@@ -622,6 +657,10 @@ public class detailMovieFragment extends Fragment implements  View.OnClickListen
             //  ********************/
             // New data is back from the server.  Hooray!
             //        mProgressBar.setVisibility(View.GONE);
+
         }
     }
+
+
+
 }

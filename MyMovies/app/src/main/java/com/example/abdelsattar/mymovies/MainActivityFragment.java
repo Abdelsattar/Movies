@@ -1,8 +1,6 @@
 package com.example.abdelsattar.mymovies;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -49,28 +47,15 @@ public class MainActivityFragment extends Fragment {
     private ImageAdapter mGridAdapter;
     private ArrayList<Movie> mGridData;
 
-    OnItemClickedListener mListener   = sDummyCallbacks;
 
-    private static OnItemClickedListener sDummyCallbacks = new OnItemClickedListener() {
-        @Override
-        public void OnItemClicked(Movie item) {
-        }
-    };
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnItemClickedListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnItemClickedListener");
-        }
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        void onItemSelected(Movie item);
     }
 
-    public interface OnItemClickedListener {
-        public void OnItemClicked(Movie item);
-    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,15 +64,6 @@ public class MainActivityFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    public static MainActivityFragment newInstance(Bundle args)
-    {
-        MainActivityFragment fragmentInstance = new MainActivityFragment();
-        if(args != null)
-        {
-            fragmentInstance.setArguments(args);
-        }
-        return fragmentInstance;
-    }
     public MainActivityFragment() {
     }
 
@@ -115,31 +91,16 @@ public class MainActivityFragment extends Fragment {
                 //Get item at position
                 Movie item = (Movie) parent.getItemAtPosition(position);
 
-                Intent intent = new Intent(getActivity(), detailMovie.class);
-
-                //Pass the movie details DetailsActivity
-                intent.putExtra("title"     , item.getTitle()).
-                        putExtra("overview" , item.getOverview()).
-                        putExtra("rating"   , item.getRating()).
-                        putExtra("rDate"    , item.getReleaseDate()).
-                        putExtra("id"    , item.getMovieID()).
-                        putExtra("pURL"     , item.getPosterURL()).
-                        putExtra("pURL"     , item.getPosterURL());
-
                 mPosition = position;
 
-
-                mListener.OnItemClicked(item);
-
-                //Start details activity
-                startActivity(intent);
-
+                ((Callback) getActivity())
+                        .onItemSelected(item);
             }
         });
 
         //--------------------
 
-        if(savedInstanceState == null || !savedInstanceState.containsKey(SELECTED_KEY)) {
+        if (savedInstanceState == null || !savedInstanceState.containsKey(SELECTED_KEY)) {
 
             mProgressBar.setVisibility(View.VISIBLE);
             //getting the setting value
@@ -193,22 +154,13 @@ public class MainActivityFragment extends Fragment {
                         movieObj.setReleaseDate(movieDetails[5]);
                         movieObj.setRating(movieDetails[6]);
 
-//                        Log.d("Movie From Prefrence",
-//                                " ---  "+movieDetails[0] +
-//                                        " --- "+movieDetails[1] +
-//                                        " ---"+movieDetails[2] +
-//                                        " ---- "+movieDetails[3] +
-//                                        " ---  "+movieDetails[4] +
-//                                        " --- "+movieDetails[5] +
-//                                        " --- "+movieDetails[6] );
 
                         rMovies = pref.getString(getString(R.string.pref_movie_name),
                                 null).split("#");
                         for(int j=0 ; j <rMovies.length ; j++){
                             reviewDetail =rMovies[i].split("|");
                             review = new Review();
-//                        Log.d("Review", "Author "+reviewDetail[0]
-//                                        + "Content "+reviewDetail[1]);
+
                             review.setAuthor(reviewDetail[0]);
                             review.setContent(reviewDetail[1]);
 
@@ -504,7 +456,7 @@ public class MainActivityFragment extends Fragment {
             }
             //  ********************/
             // New data is back from the server.  Hooray!
-          //  mProgressBar.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.GONE);
 
         }
     }

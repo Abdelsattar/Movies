@@ -2,43 +2,41 @@ package com.example.abdelsattar.mymovies;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class detailMovie extends AppCompatActivity {
+public class detailMovie extends ActionBarActivity {
 
 
-    private static final String DETAILFRAGMENT_TAG = "DFTAG";
-    private  boolean check =true;
-    public  static int postion ;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_detail_movie);
-
+        // Check that the activity is using the layout version with
+        // the fragment_container FrameLayout
         if (savedInstanceState == null) {
+            // Create the detail fragment and add it to the activity
+            // using a fragment transaction.
 
-            int id = getIntent()
-                    .getIntExtra(detailMovieFragment.ID_KEY, 0);
-            //int date = getIntent().getIntExtra(DetailsFragment.ID_KEY);
-            Log.w("TWEETID", "" + id);
+            Bundle arguments = new Bundle();
+            Bundle bundle = this.getIntent().getExtras();
+            arguments.putString("title"       , bundle.getString("title"));
+            arguments.putString("overview" , bundle.getString("overview"));
+            arguments.putString("rating"   , bundle.getString("rating"));
+            arguments.putString("rDate"    ,bundle.getString("rDate"));
+            arguments.putString("id"       , bundle.getString("id"));
+            arguments.putString("pURL"     , bundle.getString("pURL"));
 
-            Bundle args = new Bundle();
-            args.putInt(detailMovieFragment.ID_KEY, id);
-
-            detailMovieFragment fragment
-                    =  detailMovieFragment.newInstance(args);
+            detailMovieFragment fragment = new detailMovieFragment();
+            fragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
-                     .add(R.id.movie_detail_container,
-                             fragment)
+                    .add(R.id.movie_detail_container, fragment)
                     .commit();
-            }
-
+        }
     }
 
     @Override
@@ -48,19 +46,5 @@ public class detailMovie extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
