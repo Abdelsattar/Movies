@@ -24,5 +24,6 @@
 
     <string name="pref_movie_key">Movies</string>
     <string name="pref_movie_name">Movies</string>
+    <string name="number_Fav_Movies">num</string>
 
 </resources>

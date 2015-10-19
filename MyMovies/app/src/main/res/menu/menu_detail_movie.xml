@@ -1,7 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.abdelsattar.mymovies.detailMovie">
+    tools:context="com.example.abdelsattar.mymovies.Activities.detailMovie">
+
     <item android:id="@+id/action_share"
         android:title="@string/action_share"
         app:showAsAction="always"
@@ -10,4 +11,5 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
+
 </menu>
